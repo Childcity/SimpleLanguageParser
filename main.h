@@ -3,8 +3,8 @@
 
 #include <QDebug>
 
-#define DEBUGAST(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
-//#define DEBUGAST(msg){}
+//#define DEBUGAST(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
+#define DEBUGAST(msg){}
 
 #define DEBUGTRE(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
 //#define DEBUGTRE(msg){}
