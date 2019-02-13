@@ -8,7 +8,7 @@
 
 #define DEBUGM(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
 
-#define DEBUGRl(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
+#define DEBUGRl(msg) qDebug()/*.noquote()*/<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
 //#define DEBUGRl(msg){}
 
 //#define DEBUGlex(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;

@@ -26,15 +26,26 @@ public:
 class SimplePrecedenceRuleParser{
 public:
     explicit SimplePrecedenceRuleParser(QString rulesEBNF)
-        : rulesLst(rulesEBNF.simplified().replace("\t","").replace("\n","").replace("\r","").split("."))
+        : rulesLst(rulesEBNF.replace("\t","").replace("\n","").replace("\r","").trimmed().simplified().split("."))
     {
+
         for(auto it : rulesLst){
-            DEBUGRl(it.toLatin1().data())
+            if(it.isEmpty())
+                continue;
+
+            rulesMap[it.mid(0, it.indexOf(" =")).trimmed()] = it.mid(it.indexOf(" =") + 3).trimmed();
+        }
+
+        auto it = QMapIterator<QString, QString>(rulesMap);
+        while (it.hasNext()) {
+            it.next();
+            DEBUGRl(it.key()<<it.value());
         }
     }
 
 private:
     QStringList rulesLst;
+    QMap<QString, QString> rulesMap;
 };
 
 }
