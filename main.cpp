@@ -2,6 +2,7 @@
 #include "SyntacticAnalyzerRecursiveDown/syntacticalanalyzer.h"
 #include "LexicalAnalyzer/lexicalanalyzer.h"
 #include "gorodlangexception.h"
+#include "simpleprecedenceruleparser.h"
 
 #include <QApplication>
 #include <QGraphicsView>
@@ -40,8 +41,9 @@ int main(int argc, char *argv[])
 
     try {
 
+        SimplePrecedenceRuleParser ruleParser(inputRules.readAll());
 
-
+        return 0;
         const auto lexResult = LexicalAnalyzer::Parse(input.readAll());
 
         outputTable <<LexicalAnalyzer::GenerateCSVTable(lexResult) <<endl;

@@ -1,6 +1,7 @@
 #ifndef SIMPLEPRECEDENCERULEPARSER_H
 #define SIMPLEPRECEDENCERULEPARSER_H
 
+#include "main.h"
 #include "gorodlangexception.h"
 
 #include <QStringList>
@@ -25,8 +26,12 @@ public:
 class SimplePrecedenceRuleParser{
 public:
     explicit SimplePrecedenceRuleParser(QString rulesEBNF)
-        : rulesLst(rulesEBNF.split(";"))
-    {}
+        : rulesLst(rulesEBNF.simplified().replace("\t","").replace("\n","").replace("\r","").split("."))
+    {
+        for(auto it : rulesLst){
+            DEBUGRl(it.toLatin1().data())
+        }
+    }
 
 private:
     QStringList rulesLst;
