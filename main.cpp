@@ -13,11 +13,14 @@ using namespace Gorod;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QString inputPath("prog.gor"), outputPath("inputResultTable.csv");
+    QString inputProgPath("prog.gor"), outputProgPath("inputResultTable.csv"), inputEBNFPath("gorod.ebnf");
 
     if(argc >= 3){
-        QStringList args = QApplication::arguments();
-        inputPath = args[1]; outputPath = args[2];
+        inputProgPath = argv[1]; outputProgPath = argv[2];
+    }
+
+    if(argc >= 4){
+        inputEBNFPath = argv[3];
     }
 
     QGraphicsScene scene;
@@ -25,16 +28,20 @@ int main(int argc, char *argv[])
 
     view.setRenderHints(QPainter::SmoothPixmapTransform);
 
-    QFile inFile(inputPath), outFile(outputPath);
-    if (! inFile.open(QIODevice::ReadOnly | QIODevice::Text)
-            || ! outFile.open(QIODevice::WriteOnly | QIODevice::Text |QIODevice::Truncate)){
-        DEBUGM(inFile.errorString()<<outFile.errorString())
-        return 123;
+    QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileEBNF(inputEBNFPath);
+    if (! inFileProg.open(QIODevice::ReadOnly | QIODevice::Text)
+            || ! outFileProg.open(QIODevice::WriteOnly | QIODevice::Text |QIODevice::Truncate)
+            || ! inFileEBNF.open(QIODevice::ReadOnly | QIODevice::Text)){
+        DEBUGM(inFileProg.errorString()<<outFileProg.errorString())
+        return 500;
     }
 
-    QTextStream input(&inFile), outputTable(&outFile);
+    QTextStream input(&inFileProg), outputTable(&outFileProg), inputRules(&inFileEBNF);
 
     try {
+
+
+
         const auto lexResult = LexicalAnalyzer::Parse(input.readAll());
 
         outputTable <<LexicalAnalyzer::GenerateCSVTable(lexResult) <<endl;
@@ -52,6 +59,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    inFile.close(); outFile.close();
+    inFileProg.close(); outFileProg.close();
     return a.exec();
 }

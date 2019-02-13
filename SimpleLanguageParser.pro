@@ -15,7 +15,8 @@ SOURCES += \
     LexicalAnalyzer/lexicalanalyzer.cpp \
     SyntacticAnalyzerRecursiveDown/SyntacticalParserBase/syntacticalparserbase.cpp \
     SyntacticAnalyzerRecursiveDown/syntacticalanalyzer.cpp \
-    gorodlangexception.cpp
+    gorodlangexception.cpp \
+    simpleprecedenceruleparser.cpp
 
 HEADERS += \
     lexicalparserbase.h \
@@ -30,4 +31,5 @@ HEADERS += \
     LexicalAnalyzer/lexicalanalyzer.h \
     SyntacticAnalyzerRecursiveDown/SyntacticalParserBase/syntacticalparserbase.h \
     SyntacticAnalyzerRecursiveDown/syntacticalanalyzer.h \
-    gorodlangexception.h
+    gorodlangexception.h \
+    simpleprecedenceruleparser.h
