@@ -4,6 +4,9 @@
 #include "main.h"
 #include "gorodlangexception.h"
 
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QStringList>
 
 namespace Gorod {
@@ -25,27 +28,40 @@ public:
 
 class SimplePrecedenceRuleParser{
 public:
-    explicit SimplePrecedenceRuleParser(QString rulesEBNF)
-        : rulesLst(rulesEBNF.replace("\t","").replace("\n","").replace("\r","").trimmed().simplified().split("."))
+    explicit SimplePrecedenceRuleParser(QString rulesRawJson)
+        : rulesLst(QJsonDocument::fromJson(rulesRawJson.toLatin1()).toVariant().toList())
     {
+        for(auto curRule : rulesLst){
+            DEBUGRl(getRuleName(curRule));
 
-        for(auto it : rulesLst){
-            if(it.isEmpty())
-                continue;
-
-            rulesMap[it.mid(0, it.indexOf(" =")).trimmed()] = it.mid(it.indexOf(" =") + 3).trimmed();
+            for(auto ruleElem : getRuleArr(curRule)){
+                DEBUGRl(isTerminal(ruleElem));
+            }
         }
 
-        auto it = QMapIterator<QString, QString>(rulesMap);
-        while (it.hasNext()) {
-            it.next();
-            DEBUGRl(it.key()<<it.value());
-        }
+//        auto it = QMapIterator<QString, QString>(rulesMap);
+//        while (it.hasNext()) {
+//            it.next();
+//            DEBUGRl(it.key()<<it.value());
+//        }
     }
 
 private:
-    QStringList rulesLst;
-    QMap<QString, QString> rulesMap;
+    QString getRuleName(const QVariant ruleObj) const {
+        return ruleObj.toMap().begin().key();
+    }
+
+    QVariantList getRuleArr(const QVariant ruleObj) const {
+        return ruleObj.toMap().begin().value().toList();
+    }
+
+    bool isTerminal(const QVariant ruleElem) const {
+        return ruleElem.toMap()["type"] == "term";
+    }
+
+private:
+    QVariantList rulesLst;
+    QVariantMap relations;
 };
 
 }

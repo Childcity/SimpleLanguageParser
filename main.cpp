@@ -14,14 +14,14 @@ using namespace Gorod;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QString inputProgPath("prog.gor"), outputProgPath("inputResultTable.csv"), inputEBNFPath("gorod.ebnf");
+    QString inputProgPath("prog.gor"), outputProgPath("inputResultTable.csv"), inputGrammPath("gorod_v2.json");
 
     if(argc >= 3){
         inputProgPath = argv[1]; outputProgPath = argv[2];
     }
 
     if(argc >= 4){
-        inputEBNFPath = argv[3];
+        inputGrammPath = argv[3];
     }
 
     QGraphicsScene scene;
@@ -29,15 +29,15 @@ int main(int argc, char *argv[])
 
     view.setRenderHints(QPainter::SmoothPixmapTransform);
 
-    QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileEBNF(inputEBNFPath);
+    QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileGramm(inputGrammPath);
     if (! inFileProg.open(QIODevice::ReadOnly | QIODevice::Text)
             || ! outFileProg.open(QIODevice::WriteOnly | QIODevice::Text |QIODevice::Truncate)
-            || ! inFileEBNF.open(QIODevice::ReadOnly | QIODevice::Text)){
+            || ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)){
         DEBUGM(inFileProg.errorString()<<outFileProg.errorString())
         return 500;
     }
 
-    QTextStream input(&inFileProg), outputTable(&outFileProg), inputRules(&inFileEBNF);
+    QTextStream input(&inFileProg), outputTable(&outFileProg), inputRules(&inFileGramm);
 
     try {
 
