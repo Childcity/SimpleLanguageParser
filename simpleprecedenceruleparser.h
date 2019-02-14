@@ -32,18 +32,26 @@ public:
         : rulesLst(QJsonDocument::fromJson(rulesRawJson.toLatin1()).toVariant().toList())
     {
         for(auto curRule : rulesLst){
-            DEBUGRl(getRuleName(curRule));
 
-            for(auto ruleElem : getRuleArr(curRule)){
-                DEBUGRl(isTerminal(ruleElem));
+            QVariantMap curRuleRelations;
+
+            const auto ruleArr = getRuleArr(curRule);
+            for (QVariantList::const_iterator ruleElemIt = ruleArr.begin(); ruleElemIt != ruleArr.end(); ++ruleElemIt){
+                curRuleRelations[getRuleElemValue(*ruleElemIt)] = "=";
             }
+
+            relationsLst += QVariantMap({
+                                            {getRuleName(curRule), curRuleRelations}
+                                        });
+
+//            for(auto ruleElem : ruleArr){
+//                //DEBUGRl();
+//                //if(isTerminal(ruleElem))
+
+//            }
         }
 
-//        auto it = QMapIterator<QString, QString>(rulesMap);
-//        while (it.hasNext()) {
-//            it.next();
-//            DEBUGRl(it.key()<<it.value());
-//        }
+        DEBUGRl(QJsonDocument::fromVariant(relationsLst).toJson(QJsonDocument::JsonFormat::Indented));
     }
 
 private:
@@ -59,10 +67,20 @@ private:
         return ruleElem.toMap()["type"] == "term";
     }
 
+    QString getRuleElemValue(const QVariant ruleElem) const {
+        return ruleElem.toMap()["value"].toString();
+    }
+
 private:
     QVariantList rulesLst;
-    QVariantMap relations;
+    QVariantList relationsLst;
 };
+
+//        auto it = QMapIterator<QString, QString>(rulesMap);
+//        while (it.hasNext()) {
+//            it.next();
+//            DEBUGRl(it.key()<<it.value());
+//        }
 
 }
 
