@@ -180,11 +180,10 @@ public:
         stream.flush();
 
         QProcess* p = new QProcess();
-        QByteArray a = ASTTreeSource;
 
         p->setProcessChannelMode(QProcess::MergedChannels);
         p->start("dot", QStringList() << "-Tpng");
-        p->write(a);
+        p->write(ASTTreeSource);
 
         QByteArray data;
         QPixmap pixmap = QPixmap();
