@@ -226,48 +226,96 @@ private:
     }
 
     void transformToFirstPlus(){
-        // find terminals in relationsLst
+        // for each rule we try to find FIRST+ relation
         for(auto &ruleIt : relationsLst){
-            if(! isTerminal(ruleIt)){
-                continue;
-            }
-            //DEBUGRl(ruleIt.toMap().firstKey());
+            auto existedRuleReletion = static_cast<QVariantMap*>(
+                            // get link to first element in map and convert it to QVarianMap
+                            static_cast<QVariantMap*>(ruleIt.data())->first().data()
+                        );
 
             QStringList nonTerminalsFromCol;
 
-            {
-                QVariantMap currReletionMap = ruleIt.toMap().cbegin().value().toMap();
-                for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
-                    QString relElemKey = relElemIt.key();
-                    QString relElemVal = relElemIt.value().toString();
-                    if(relElemVal.contains("=") && relElemKey[0].isUpper() && relElemKey != "Ident" && relElemKey != "Number") //if First letter is Upper -> it is nonTerminal
-                        //if(! nonTerminalsFromCol.contains(relElemKey))
-                        nonTerminalsFromCol <<relElemKey;
-                }
+            // find for current rule all subrules, that is not a terminal and append them to 'nonTerminalsFromCol' list
+            for (auto relElemIt = existedRuleReletion->cbegin(); relElemIt != existedRuleReletion->cend(); ++relElemIt){
+                QString relElemKey = relElemIt.key();
+                QString relElemVal = relElemIt.value().toString();
+                if(relElemVal.contains("=") && relElemKey[0].isUpper() && relElemKey != "Ident" && relElemKey != "Number") //if First letter is Upper -> it is nonTerminal
+                    //if(! nonTerminalsFromCol.contains(relElemKey))
+                    nonTerminalsFromCol <<relElemKey;
             }
 
+            // for each non terminal element, that is in 'nonTerminalsFromCol' we find rule in 'relationsLst'
             for(const auto &nonTermFromColIt : nonTerminalsFromCol){
-                // find all relatins where exist FIRST+
                  for(auto &ruleIt2 : relationsLst){
                      if(getRuleName(ruleIt2) != nonTermFromColIt){
                          continue;
                      }
 
-                     QVariantMap currReletionMap = ruleIt2.toMap().cbegin().value().toMap();
+                     // in subrul of founded rule we find relation 'F' if exist
+                     QVariantMap currReletionMap = ruleIt2.toMap().first().toMap();
                      for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
                          QString relElemKey = relElemIt.key();
                          QString relElemVal = relElemIt.value().toString();
                          if(relElemVal.contains("F")){
-                            DEBUGRl(getRuleName(ruleIt) <<relElemKey<<relElemVal <<"<");
-                            //всунуть
-                            auto existedRuleReletion = static_cast<QVariantMap*>(
-                                            // get link to first element in map and convert it to QVarianMap
-                                            static_cast<QVariantMap*>(ruleIt.data())->first().data()
-                                        );
-                            DEBUGRl(existedRuleReletion->keys().first());
+                            // add "<" relation to relationsLst
+                            QString newRelationValue = existedRuleReletion->key(relElemKey) + "<";
+                            //DEBUGRl(getRuleName(ruleIt) <<relElemKey<<relElemVal <<"OldCell:"<<existedRuleReletion->key(relElemKey) <<"NewCell:" <<newRelationValue);
+                            existedRuleReletion->insert(relElemKey, newRelationValue);
+                            //DEBUGRl(existedRuleReletion->keys().first() <<currReletionMap.keys().first());
                          }
                      }
                  }
+            }
+
+        }
+    }
+
+    void transformToLastPlus(){
+        // for each rule we try to find LAST+ relation
+        for(auto &ruleIt : relationsLst){
+            auto existedRuleReletion = static_cast<QVariantMap*>(
+                            // get link to first element in map and convert it to QVarianMap
+                            static_cast<QVariantMap*>(ruleIt.data())->first().data()
+                        );
+
+            QStringList ruleNamesFromCol;
+
+            // find for current rule all subrules, that is not a terminal and append them to 'nonTerminalsFromCol' list
+            for (auto relElemIt = existedRuleReletion->cbegin(); relElemIt != existedRuleReletion->cend(); ++relElemIt){
+                QString relElemKey = relElemIt.key();
+                QString relElemVal = relElemIt.value().toString();
+                if(relElemVal.contains("=")) //if First letter is Upper -> it is nonTerminal
+                    ruleNamesFromCol <<relElemKey;
+            }
+
+            // for each non terminal element, that is in 'nonTerminalsFromCol' we find rule in 'relationsLst'
+            for(const auto &ruleNamesFromColIt : ruleNamesFromCol){
+                if(ruleNamesFromColIt[0].isUpper() && ruleNamesFromColIt != "Ident" && ruleNamesFromColIt != "Number"){
+                    // we found terminal in Column
+
+                } else {
+                    // we found non terminal in Column
+
+                    for(auto &ruleIt2 : relationsLst){
+                        if(getRuleName(ruleIt2) != nonTermFromColIt){
+                            continue;
+                        }
+
+                        // in subrul of founded rule we find relation 'F' if exist
+                        QVariantMap currReletionMap = ruleIt2.toMap().first().toMap();
+                        for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
+                            QString relElemKey = relElemIt.key();
+                            QString relElemVal = relElemIt.value().toString();
+                            if(relElemVal.contains("F")){
+                               // add "<" relation to relationsLst
+                               QString newRelationValue = existedRuleReletion->key(relElemKey) + "<";
+                               //DEBUGRl(getRuleName(ruleIt) <<relElemKey<<relElemVal <<"OldCell:"<<existedRuleReletion->key(relElemKey) <<"NewCell:" <<newRelationValue);
+                               existedRuleReletion->insert(relElemKey, newRelationValue);
+                               //DEBUGRl(existedRuleReletion->keys().first() <<currReletionMap.keys().first());
+                            }
+                        }
+                    }
+                }
             }
 
         }
@@ -280,4 +328,46 @@ private:
 
 }
 
+//void transformToFirstPlus(){
+//    // find terminals in relationsLst
+//    for(auto &ruleIt : relationsLst){
+
+//        QStringList nonTerminalsFromCol;
+
+//        // get link to relation in current rule
+//        auto currReletionMap = static_cast<QVariantMap*>(
+//                        // get link to first element in map and convert it to QVarianMap
+//                        static_cast<QVariantMap*>(ruleIt.data())->first().data()
+//                    );
+
+//        for (auto relElemIt = currReletionMap->cbegin(); relElemIt != currReletionMap->cend(); ++relElemIt){
+//            QString relElemKey = relElemIt.key();
+//            QString relElemVal = relElemIt.value().toString();
+//            // take only nonTerminals from columns
+//            if(relElemVal.contains("=") && relElemKey[0].isUpper() && relElemKey != "Ident" && relElemKey != "Number") //if First letter is Upper -> it is nonTerminal
+//                nonTerminalsFromCol <<relElemKey;
+//        }
+
+//        for (const auto &nonTermFromColIt : nonTerminalsFromCol){
+//            // find all relatins where exist FIRST+
+//             for(auto &ruleIt2 : relationsLst){
+//                 if(getRuleName(ruleIt2) != nonTermFromColIt){
+//                     continue;
+//                 }
+
+//                 //QVariantMap currReletionMap = ruleIt2.toMap().cbegin().value().toMap();
+//                 for (auto relElemIt = currReletionMap->cbegin(); relElemIt != currReletionMap->cend(); ++relElemIt){
+//                     QString relElemKey = relElemIt.key();
+//                     QString relElemVal = relElemIt.value().toString();
+//                     if(relElemVal.contains("F")){
+//                        DEBUGRl(getRuleName(ruleIt) <<relElemKey<<relElemVal <<"<");
+//                        //всунуть
+//                        DEBUGRl(currReletionMap->keys().first());
+//                     }
+//                 }
+//             }
+//        }
+
+//    }
+//}
 #endif // SIMPLEPRECEDENCERULEPARSER_H
