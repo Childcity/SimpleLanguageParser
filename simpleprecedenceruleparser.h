@@ -231,17 +231,43 @@ private:
             if(! isTerminal(ruleIt)){
                 continue;
             }
-            DEBUGRl(ruleIt.toMap().firstKey());
+            //DEBUGRl(ruleIt.toMap().firstKey());
 
             QStringList nonTerminalsFromCol;
-            QVariantMap currReletionMap = ruleIt.toMap();
-            for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
-                QString relElemStr = relElemIt.key();
-                if(relElemStr[0].isUpper()) //if First letter is Upper -> it is nonTerminal
-                    nonTerminalsFromCol <<relElemStr;
+
+            {
+                QVariantMap currReletionMap = ruleIt.toMap().cbegin().value().toMap();
+                for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
+                    QString relElemKey = relElemIt.key();
+                    QString relElemVal = relElemIt.value().toString();
+                    if(relElemVal.contains("=") && relElemKey[0].isUpper() && relElemKey != "Ident" && relElemKey != "Number") //if First letter is Upper -> it is nonTerminal
+                        //if(! nonTerminalsFromCol.contains(relElemKey))
+                        nonTerminalsFromCol <<relElemKey;
+                }
             }
-            for(auto it:nonTerminalsFromCol){
-                DEBUGRl(ruleIt.toMap().firstKey() <<"nonTerminals" <<it)
+
+            for(const auto &nonTermFromColIt : nonTerminalsFromCol){
+                // find all relatins where exist FIRST+
+                 for(auto &ruleIt2 : relationsLst){
+                     if(getRuleName(ruleIt2) != nonTermFromColIt){
+                         continue;
+                     }
+
+                     QVariantMap currReletionMap = ruleIt2.toMap().cbegin().value().toMap();
+                     for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
+                         QString relElemKey = relElemIt.key();
+                         QString relElemVal = relElemIt.value().toString();
+                         if(relElemVal.contains("F")){
+                            DEBUGRl(getRuleName(ruleIt) <<relElemKey<<relElemVal <<"<");
+                            //всунуть
+                            auto existedRuleReletion = static_cast<QVariantMap*>(
+                                            // get link to first element in map and convert it to QVarianMap
+                                            static_cast<QVariantMap*>(ruleIt.data())->first().data()
+                                        );
+                            DEBUGRl(existedRuleReletion->keys().first());
+                         }
+                     }
+                 }
             }
 
         }
