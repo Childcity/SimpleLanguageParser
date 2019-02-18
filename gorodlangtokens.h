@@ -32,7 +32,7 @@ struct LangTokens {
             {Token::Point,              "."},       {Token::Question,               "?"},
             {Token::DoubleDot,          ":"},
 
-            {Token::IDENT,              "IDENT"},   {Token::CONSTANT,               "CONSTANT"}
+            {Token::IDENT,              "Ident"},   {Token::CONSTANT,               "Const"}
         };
 
         return tokens;
