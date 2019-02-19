@@ -8,7 +8,7 @@ namespace Gorod {
 struct LangTokens {
     enum class Token{LeftBraket, RightBraket, Int, Read, Write, For, To, By, While, Rof, If,
                       Add, Sub, Mul, Div, Power, LeftRoundBracket, RightRoundBracket, Assign, More,
-                      Less, DotPoint, Comma, Point, Question, DoubleDot, IDENT, CONSTANT, UNKNOWN, GOROD};
+                      Less, DotPoint, Comma, Point, Question, DoubleDot, IDENT, NUMBER, UNKNOWN, GOROD};
 
     const static QMap<Token, QString> GetToken() {
          const static QMap<Token, QString> tokens{
@@ -32,7 +32,7 @@ struct LangTokens {
             {Token::Point,              "."},       {Token::Question,               "?"},
             {Token::DoubleDot,          ":"},
 
-            {Token::IDENT,              "Ident"},   {Token::CONSTANT,               "Const"}
+            {Token::IDENT,              "Ident"},   {Token::NUMBER,               "Number"}
         };
 
         return tokens;

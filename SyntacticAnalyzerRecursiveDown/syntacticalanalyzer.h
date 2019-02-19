@@ -40,7 +40,7 @@ public:
         next();
 
         DEBUGSYNTX("<- Number. Next lexeme"<<lexemeValue())
-        return ASTNode::GetNewInstance(Token::CONSTANT, number);
+        return ASTNode::GetNewInstance(Token::NUMBER, number);
     }
 
     //Ident = Letter {letter | digit | "_"} .
