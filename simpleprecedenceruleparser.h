@@ -66,12 +66,13 @@ public:
                         continue;
                     }
 
-                    // if First/Last is terminal -> just write it to the table
+                    // if First/Last is not terminal -> recursive go into
                     const auto firstOrLastArrElem = isFindFirst ? ruleArr.first().toMap() : ruleArr.last().toMap();
                     QString subRuleName = firstOrLastArrElem["value"].toString();
+                    putRelation(getRuleName(curRule), {{subRuleName, isFindFirst ? "F" : "L"}});
+
                     if(isTerminal(firstOrLastArrElem)){
                         currRuleMemory <<subRuleName;
-                        putRelation(getRuleName(curRule), {{subRuleName, isFindFirst ? "F" : "L"}});
                         return;
                     }else{
                         if(checkOnInfiniteRecursion(subRuleName, currRuleMemory)){
@@ -84,9 +85,9 @@ public:
                 }
             };
 
-            recursePutRules(getRuleArr(curRule), true); //Find FIRST
+            recursePutRules(getRuleArr(curRule), true); //Find FIRST+
             transformToFirstPlus();
-            recursePutRules(getRuleArr(curRule), false); //Find LAST
+            recursePutRules(getRuleArr(curRule), false); //Find LAST+
             transformToLastPlus();
         }
 
@@ -248,9 +249,10 @@ private:
                      for (auto relElemIt = currReletionMap.cbegin(); relElemIt != currReletionMap.cend(); ++relElemIt){
                          QString relElemKey = relElemIt.key();
                          QString relElemVal = relElemIt.value().toString();
-                         if(relElemVal.contains("F")){
+                         QString existedRelElemVal = existedRuleReletion->value(relElemKey).toString();
+                         if(relElemVal.contains("F") && (! existedRelElemVal.contains("<"))){
                             // add "<" relation to relationsLst
-                            QString newRelationValue = existedRuleReletion->key(relElemKey) + "<";
+                            QString newRelationValue = existedRelElemVal + "<";
                             //DEBUGRl(getRuleName(ruleIt) <<relElemKey<<relElemVal <<"OldCell:"<<existedRuleReletion->key(relElemKey) <<"NewCell:" <<newRelationValue);
                             existedRuleReletion->insert(relElemKey, newRelationValue);
                             //DEBUGRl(existedRuleReletion->keys().first() <<currReletionMap.keys().first());
