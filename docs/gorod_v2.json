@@ -1,0 +1,162 @@
+[
+  {
+   "Block": [
+       { "type": "term", "value": "{"}, 
+       { "type": "non_term", "value": "VarDefinition"}, 
+       { "type": "non_term", "value": "Statement"}, 
+       { "type": "term", "value": "}"}
+     ]
+  },
+  {
+   "VarDefinition": [
+       { "type": "non_term", "value": "Type"}, 
+       { "type": "term", "value": "Ident"},
+       { "type": "term", "value": ","},
+       { "type": "term", "value": "Ident"},
+       { "type": "term", "value": ";"}
+     ]
+  },
+  {
+   "Type": [
+       { "type": "term", "value": "int"}
+     ]
+  },
+  {
+   "Statement": [
+      [
+       { "type": "term", "value": ";"}
+      ],
+      [
+       { "type": "non_term", "value": "Assignment"},
+       { "type": "term", "value": ";"}
+      ],
+      [
+       { "type": "term", "value": "read"},
+       { "type": "term", "value": "("},
+       { "type": "term", "value": "Ident"},
+       { "type": "term", "value": ")"},
+       { "type": "term", "value": ";"}
+      ],
+      [
+       { "type": "term", "value": "write"},
+       { "type": "term", "value": "("},
+       { "type": "non_term", "value": "Expr"},
+       { "type": "term", "value": ")"},
+       { "type": "term", "value": ";"}
+      ],
+      [
+       { "type": "term", "value": "if"},
+       { "type": "term", "value": "("},
+       { "type": "non_term", "value": "LogicExpr"},
+       { "type": "term", "value": ")"},
+       { "type": "non_term", "value": "Block"}
+      ],
+      [
+       { "type": "term", "value": "for"},
+       { "type": "non_term", "value": "Assignment"},
+       { "type": "term", "value": "to"},
+       { "type": "non_term", "value": "Expr"},
+       { "type": "term", "value": "by"},
+       { "type": "non_term", "value": "Expr"},
+       { "type": "term", "value": "while"},
+       { "type": "term", "value": "("},
+       { "type": "non_term", "value": "LogicExpr"},
+       { "type": "term", "value": ")"},
+       { "type": "non_term", "value": "Block"},
+       { "type": "term", "value": "rof"},
+       { "type": "term", "value": ";"}
+      ]
+    ]
+  },
+  {
+   "Assignment": [
+       { "type": "term", "value": "Ident"},
+       { "type": "term", "value": "="}, 
+       { "type": "non_term", "value": "Expr"}
+     ]
+  },
+  {
+   "Expr": [
+      [
+       { "type": "non_term", "value": "CondExpr"}
+      ],
+      [
+       { "type": "non_term", "value": "Add"}
+      ]
+     ]
+  },
+  {
+   "Add": [
+      [
+       { "type": "non_term", "value": "Mult"},
+       { "type": "term", "value": "+"}, 
+       { "type": "non_term", "value": "Mult"}
+      ],
+      [
+       { "type": "non_term", "value": "Mult"},
+       { "type": "term", "value": "-"}, 
+       { "type": "non_term", "value": "Mult"}
+      ]
+     ]
+  },
+  {
+   "Mult": [
+      [
+       { "type": "non_term", "value": "Power"},
+       { "type": "term", "value": "*"}, 
+       { "type": "non_term", "value": "Power"}
+      ],
+      [
+       { "type": "non_term", "value": "Power"},
+       { "type": "term", "value": "/"}, 
+       { "type": "non_term", "value": "Power"}
+      ]
+     ]
+  },
+  {
+   "Power": [
+       { "type": "non_term", "value": "Group"},
+       { "type": "term", "value": "^"}, 
+       { "type": "non_term", "value": "Group"}
+     ]
+  },
+  {
+   "Group": [
+      [
+       { "type": "term", "value": "("}, 
+       { "type": "non_term", "value": "Expr"},
+       { "type": "term", "value": ")"}
+      ],
+      [
+       { "type": "term", "value": "Number"}
+      ],
+      [
+       { "type": "term", "value": "Ident"}
+      ]
+     ]
+  },
+  {
+   "CondExpr": [
+       { "type": "non_term", "value": "LogicExpr"},
+       { "type": "term", "value": "?"},
+       { "type": "non_term", "value": "Expr"},
+       { "type": "term", "value": ":"}, 
+       { "type": "non_term", "value": "Expr"}
+     ]
+  },
+  {
+   "LogicExpr": [
+      [
+       { "type": "term", "value": "Ident"},
+       { "type": "term", "value": "<"},  
+       { "type": "non_term", "value": "Expr"}
+      ],
+      [
+       { "type": "term", "value": "Ident"},
+       { "type": "term", "value": ">"}, 
+       { "type": "non_term", "value": "Expr"}
+      ]
+     ]
+  }
+]
+
