@@ -14,7 +14,7 @@ using namespace Gorod;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QString inputProgPath("prog.gor"), outputProgPath("inputResultTable.csv"), inputGrammPath("gorod_v2.json");
+    QString inputProgPath("prog.gor"), outputProgPath("inputResultTable.csv"), inputGrammPath("gorod_v2.json"), outputGrammPath("relations.csv");
 
     if(argc >= 3){
         inputProgPath = argv[1]; outputProgPath = argv[2];
@@ -29,21 +29,26 @@ int main(int argc, char *argv[])
 
     view.setRenderHints(QPainter::SmoothPixmapTransform);
 
-    QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileGramm(inputGrammPath);
+    QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileGramm(inputGrammPath), outFileGramm(outputGrammPath);
     if (! inFileProg.open(QIODevice::ReadOnly | QIODevice::Text)
             || ! outFileProg.open(QIODevice::WriteOnly | QIODevice::Text |QIODevice::Truncate)
-            || ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)){
+            || ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)
+            || ! outFileGramm.open(QIODevice::WriteOnly | QIODevice::Text)){
         DEBUGM(inFileProg.errorString()<<outFileProg.errorString())
         return 500;
     }
 
-    QTextStream input(&inFileProg), outputTable(&outFileProg), inputRules(&inFileGramm);
+    QTextStream input(&inFileProg), outputTable(&outFileProg), inputRules(&inFileGramm), outputRelations(&outFileGramm);
 
     try {
 
         SimplePrecedenceRuleParser ruleParser(inputRules.readAll());
+        ruleParser.Parse();
+        DEBUGRl(ruleParser.toJson());
+        outputRelations << ruleParser.toCSVTable() <<endl <<endl;
+        outputRelations << ruleParser.toJson().replace(";", "!").replace(": ", ": ;");
 
-        return 0;
+        //return 0;
         const auto lexResult = LexicalAnalyzer::Parse(input.readAll());
 
         outputTable <<LexicalAnalyzer::GenerateCSVTable(lexResult) <<endl;

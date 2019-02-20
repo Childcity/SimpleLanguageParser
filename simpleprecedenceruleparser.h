@@ -33,7 +33,9 @@ class SimplePrecedenceRuleParser{
 public:
     explicit SimplePrecedenceRuleParser(QString rulesRawJson)
         : rulesLst(QJsonDocument::fromJson(rulesRawJson.toLatin1()).toVariant().toList())
-    {
+    {}
+
+    void Parse(){
         // find all "=." relations
         for(const auto &curRule : rulesLst){
             std::function<void(const QVariantList&)> recursePutRules = [&](const QVariantList &ruleArr) mutable {
@@ -45,7 +47,7 @@ public:
 
                     // if exist next rule
                     if((ruleElemIt + 1) != ruleArr.end() && (! (*(ruleElemIt + 1)).isNull())){
-                        putRelation(getRuleElemValue(*ruleElemIt), {{getRuleElemValue(*(ruleElemIt + 1)), ".="}});
+                        putRelation(getRuleElemValue(*ruleElemIt), {{getRuleElemValue(*(ruleElemIt + 1)), " ="}});
                     }
                 }
             };
@@ -90,12 +92,10 @@ public:
             recursePutRules(getRuleArr(curRule), false); //Find LAST+
             transformToLastPlus();
         }
+    }
 
-        DEBUGRl(QJsonDocument::fromVariant(relationsLst).toJson(QJsonDocument::JsonFormat::Indented));
-        QFile file("relations.csv");
-        file.open(QIODevice::WriteOnly | QIODevice::Text |QIODevice::Truncate);
-        QTextStream out(&file);
-        out << toCSVTable();
+    QString toJson() const {
+        return QJsonDocument::fromVariant(relationsLst).toJson(QJsonDocument::JsonFormat::Indented);
     }
 
     QString toCSVTable() {
@@ -137,6 +137,10 @@ public:
         }
 
         return buff;
+    }
+
+    QVariantList getRelations() const {
+        return relationsLst;
     }
 
 private:
