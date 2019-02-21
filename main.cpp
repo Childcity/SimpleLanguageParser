@@ -31,9 +31,9 @@ int main(int argc, char *argv[])
 
     QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileGramm(inputGrammPath), outFileGramm(outputGrammPath);
     if (! inFileProg.open(QIODevice::ReadOnly | QIODevice::Text)
-            || ! outFileProg.open(QIODevice::WriteOnly | QIODevice::Text |QIODevice::Truncate)
+            || ! outFileProg.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)
             || ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)
-            || ! outFileGramm.open(QIODevice::WriteOnly | QIODevice::Text)){
+            || ! outFileGramm.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
         DEBUGM(inFileProg.errorString()<<outFileProg.errorString())
         return 500;
     }

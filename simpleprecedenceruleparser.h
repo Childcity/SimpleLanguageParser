@@ -47,6 +47,7 @@ public:
 
                     // if exist next rule
                     if((ruleElemIt + 1) != ruleArr.end() && (! (*(ruleElemIt + 1)).isNull())){
+                        DEBUGRl(getRuleElemValue(*ruleElemIt)<< getRuleElemValue(*(ruleElemIt + 1)))
                         putRelation(getRuleElemValue(*ruleElemIt), {{getRuleElemValue(*(ruleElemIt + 1)), " ="}});
                     }
                 }
@@ -58,9 +59,9 @@ public:
         // find all "<." and ">." relations. (FIRST+/LAST+)
         for(const auto &curRule : rulesLst){
 
-            QList<QString> currRuleMemory;
+            QStringList currRuleMemory;
 
-            std::function<void(const QVariantList, bool)> recursePutRules = [&](const QVariantList ruleArr, bool isFindFirst){
+            std::function<void(const QVariantList, bool)> recursePutRules = [&](const QVariantList ruleArr, bool isFindFirst) mutable {
                 for (auto ruleElemIt = ruleArr.cbegin(); ruleElemIt != ruleArr.cend(); ++ruleElemIt){
 
                     if(ruleElemIt->userType() == QMetaType::QVariantList){
@@ -89,7 +90,7 @@ public:
 
             recursePutRules(getRuleArr(curRule), true); //Find FIRST+
             transformToFirstPlus();
-            recursePutRules(getRuleArr(curRule), false); //Find LAST+
+            //recursePutRules(getRuleArr(curRule), false); //Find LAST+
             transformToLastPlus();
         }
     }
@@ -222,15 +223,52 @@ private:
         throw std::logic_error("ERROR: " + ruleToFind.toStdString() + " not found!");
     }
 
-    bool checkOnInfiniteRecursion(const QString &rule, const QList<QString> &memory){
-        if(memory.size() >= 4){
-            //DEBUGRl(memory.at(memory.size() - 1) <<memory.at(memory.size() - 2)<< memory);
-            if((memory.at(memory.size() - 2) == "Expr")
-                    && (memory.at(memory.size() - 1) == "CondExpr")
-                    && (rule == "Expr")){
-                return true;
+    bool checkOnInfiniteRecursion(const QString &rule, QStringList memory){
+//        if(memory.size() >= 4){
+//            DEBUGRl(memory.at(memory.size() - 1) <<memory.at(memory.size() - 2));
+//            if(
+//                    ((memory.at(memory.size() - 2) == "Expr")
+//                        && (memory.at(memory.size() - 1) == "CondExpr")
+//                        && (rule == "Expr")
+//                     )
+////                    ||
+////                    ((memory.at(memory.size() - 2) == "Power")
+////                        && (memory.at(memory.size() - 1) == "Add")
+////                        && ((rule == "Mult")||(rule == "Power")||(rule == "Add"))
+////                     )
+//                    ){
+//                return true;
+//            }
+//        }return false;
+        memory <<rule;
+        int memSize = memory.size();
+
+        if(memory.size() >= 1){
+            QString lastElem(memory.last());
+
+            int countOfRepeats = 0;
+
+            for (int elemsCount = 2; elemsCount <= 5; ++elemsCount) {
+                countOfRepeats = 5;
+                if((countOfRepeats * elemsCount) >= (memSize - 1))
+                    break;
+
+                while(countOfRepeats--){
+                    // if on some iter we found, that this elem isn't repeted more -> exit
+                    qDebug() <<"countOfRepeats:" <<countOfRepeats <<memory.at((memSize - 1) - (countOfRepeats * elemsCount)) <<"last:"<<lastElem;
+                    qDebug() <<memory;
+                    if(lastElem != memory.at((memSize - 1) - (countOfRepeats * elemsCount))){
+                         //qDebug() <<"No repeats. Stopped at: " <<countOfRepeats <<mem;
+                        break;
+                    }
+                }
+                if(countOfRepeats < 0) {
+                    qDebug() <<"true";
+                    return true;
+                }
             }
         }
+qDebug() <<"false";
         return false;
     }
 

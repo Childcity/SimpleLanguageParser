@@ -27,7 +27,7 @@ Add = Mult [( "+" | "-" ) Mult] .
 
 Mult = Power [( "*" | "/" ) Power] .
 
-Power = Group ["^" Group] .
+Power = Group ["^" Add] .
 
 Group = "(" Expr ")"  
         | Number

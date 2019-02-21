@@ -83,7 +83,7 @@ public:
         if (isMatch("^")) { // повторяем нужное кол-во раз
             // здесь выбор альтернативы
             QString oper = match("^");
-            auto temp = Group();
+            auto temp = Add();
             result = ASTNode::GetNewInstance(Token::Power, result, temp);
         }
         DEBUGSYNTX("<- Power. Next lexeme"<<lexemeValue())
