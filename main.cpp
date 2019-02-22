@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         outputRelations << ruleParser.toCSVTable() <<endl <<endl;
         outputRelations << ruleParser.toJson().replace(";", "!").replace(": ", ": ;");
 
-        //return 0;
+        return 0;
         const auto lexResult = LexicalAnalyzer::Parse(input.readAll());
 
         outputTable <<LexicalAnalyzer::GenerateCSVTable(lexResult) <<endl;

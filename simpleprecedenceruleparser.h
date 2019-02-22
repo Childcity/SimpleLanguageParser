@@ -90,7 +90,7 @@ public:
 
             recursePutRules(getRuleArr(curRule), true); //Find FIRST+
             transformToFirstPlus();
-            //recursePutRules(getRuleArr(curRule), false); //Find LAST+
+            recursePutRules(getRuleArr(curRule), false); //Find LAST+
             transformToLastPlus();
         }
     }
@@ -224,51 +224,25 @@ private:
     }
 
     bool checkOnInfiniteRecursion(const QString &rule, QStringList memory){
-//        if(memory.size() >= 4){
-//            DEBUGRl(memory.at(memory.size() - 1) <<memory.at(memory.size() - 2));
-//            if(
-//                    ((memory.at(memory.size() - 2) == "Expr")
-//                        && (memory.at(memory.size() - 1) == "CondExpr")
-//                        && (rule == "Expr")
-//                     )
-////                    ||
-////                    ((memory.at(memory.size() - 2) == "Power")
-////                        && (memory.at(memory.size() - 1) == "Add")
-////                        && ((rule == "Mult")||(rule == "Power")||(rule == "Add"))
-////                     )
-//                    ){
-//                return true;
-//            }
-//        }return false;
-        memory <<rule;
-        int memSize = memory.size();
-
-        if(memory.size() >= 1){
-            QString lastElem(memory.last());
-
-            int countOfRepeats = 0;
-
-            for (int elemsCount = 2; elemsCount <= 5; ++elemsCount) {
-                countOfRepeats = 5;
-                if((countOfRepeats * elemsCount) >= (memSize - 1))
-                    break;
-
-                while(countOfRepeats--){
-                    // if on some iter we found, that this elem isn't repeted more -> exit
-                    qDebug() <<"countOfRepeats:" <<countOfRepeats <<memory.at((memSize - 1) - (countOfRepeats * elemsCount)) <<"last:"<<lastElem;
-                    qDebug() <<memory;
-                    if(lastElem != memory.at((memSize - 1) - (countOfRepeats * elemsCount))){
-                         //qDebug() <<"No repeats. Stopped at: " <<countOfRepeats <<mem;
-                        break;
-                    }
-                }
-                if(countOfRepeats < 0) {
-                    qDebug() <<"true";
-                    return true;
-                }
+        if(memory.size() >= 4){
+            //DEBUGRl(memory.at(memory.size() - 4) <<memory.at(memory.size() - 3) <<memory.at(memory.size() - 2) <<memory.at(memory.size() - 1) <<rule);
+            if(
+                    (      (memory.at(memory.size() - 2) == "Expr")
+                        && (memory.at(memory.size() - 1) == "CondExpr")
+                        && (rule == "Expr")
+                     )
+                    ||
+                    (      (memory.at(memory.size() - 3) == "Add")
+                        && (memory.at(memory.size() - 2) == "Mult")
+                        && (memory.at(memory.size() - 1) == "Power")
+                        && (rule == "Add" || rule == "Power" || rule == "Mult")
+                     )
+                    ){
+                //DEBUGRl(true)
+                return true;
             }
         }
-qDebug() <<"false";
+        //DEBUGRl(false)
         return false;
     }
 

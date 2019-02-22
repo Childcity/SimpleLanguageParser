@@ -18,7 +18,7 @@ Statement = ";"
             | "if" "(" LogicExpr ")" Block 
             | "for" Assignment "to" Expr "by" Expr "while" "(" LogicExpr ")" Block "rof" ";" . 
 
-Assignment = Ident "=" Expr .
+Assignment = Ident "=" "(" Expr ")" .
 
 Expr = CondExpr
         | Add . 
@@ -33,9 +33,9 @@ Group = "(" Expr ")"
         | Number
         | Ident .
 
-CondExpr = LogicExpr ["?" Expr ":" Expr] .
+CondExpr = LogicExpr ["?" "(" Expr ")" ":" "(" Expr ")"] .
 
-LogicExpr = Ident ("<" | ">") Expr .
+LogicExpr = Ident ("<" | ">") "(" Expr ")" .
 
 Number = [ "-" ] digit{digit} .
 
