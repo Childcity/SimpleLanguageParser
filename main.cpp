@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
     if (! inFileProg.open(QIODevice::ReadOnly | QIODevice::Text)
             //|| ! lexerOutFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)
             //|| ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)
-            || ! outFileGramm.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+            //|| ! outFileGramm.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)
+            ){
 
         DEBUGM(inFileProg.errorString() <<lexerOutFile.errorString()
                <<inFileGramm.errorString() <<outFileGramm.errorString());
@@ -73,6 +74,8 @@ int main(int argc, char *argv[])
         qDebug()<<"\n";
 
         const auto astTree = SyntacticalAnalyzer::Parse(lexResult);
+        SyntacticalAnalyzer::GenerateReversePolishNotation(astTree);
+
         ASTNodeWalker::ShowASTTree(astTree, scene, view);
 
     } catch (Gorod::Exception &e) {

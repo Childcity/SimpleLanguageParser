@@ -5,9 +5,12 @@
 #include "SyntacticalParserBase/syntacticalparserbase.h"
 #include "ASTree/astnode.h"
 
+#include <QJsonDocument>
 #include <QMap>
 
 namespace Gorod {
+static QVariantList synataxTree;
+static QString rpn;
 
 class SyntacticalException : public SyntacticalParserBaseException {
 public:
@@ -109,7 +112,7 @@ public:
         DEBUGSYNTX("-> Add"<<lexemeValue())
         auto result = Mult();
         while (isMatch("+", "-")) {
-            QString oper = match("+", "-");DEBUGSYNTX(oper)
+            QString oper = match("+", "-");
             auto temp = Mult();
             result = (oper == "+") ? ASTNode::GetNewInstance(Token::Add, result, temp)
                                     : ASTNode::GetNewInstance(Token::Sub, result, temp);
@@ -278,9 +281,69 @@ public:
         return gorodProg;
     }
 
+
+
+
     static ASTNode::SharedPtr Parse(const QVariantList &source){
         SyntacticalAnalyzer ASTResult(source);
         return ASTResult.Parse();
+    }
+
+    static void GenerateReversePolishNotation(ASTNode::SharedPtr tree){
+        QList<ASTNode::SharedPtr> subRuleLst;
+        forEachSubElements(tree, subRuleLst);
+        qDebug().noquote() <<QJsonDocument::fromVariant(synataxTree).toJson(QJsonDocument::JsonFormat::Indented);
+        qDebug().noquote() <<rpn;
+    }
+
+    static void forEachSubElements(ASTNode::SharedPtr subRule, QList<ASTNode::SharedPtr> &subRuleLst, QString tab = QString())
+    {
+        if(subRule->getChildsCount() > 0){
+            QList<ASTNode::SharedPtr> newSubRulesLst;
+
+            for (int i = 0; i < subRule->getChildsCount(); i++) {
+                forEachSubElements(subRule->getChild(i), newSubRulesLst, tab + " ");
+            }
+
+            QString childs;
+            QVariantList subTokenLst;
+            for(auto ch : newSubRulesLst){
+//                subTokenLst += QVariantMap({
+//                                               {"lexem", ch->getText()+" (" + LangTokens::GetToken(ch->getType()) + ")"}
+//                                               //, {"token", LangTokens::GetToken(ch->getType())}
+//                                               , {"id   ", ch->getUniqueName().split("node")[1]}
+//                                           });
+                childs += ch->getText() + "(" + ch->getUniqueName().split("node")[1]/*LangTokens::GetToken(ch->getType())*/ + ") ";
+            }
+//            synataxTree += QVariantMap({
+//                                           {  "sub_rules", subTokenLst}
+//                                           , {"rule     ", subRule->getText()}
+//                                           , {"id       ", subRule->getUniqueName().split("node")[1]}
+//                                       });
+            qDebug().noquote() <<tab <<"Childrens: " <<childs;
+            qDebug().noquote() <<tab<<"Was Children OF:" <<subRule->getText()  << "(" <<subRule->getUniqueName().split("node")[1] << ") "<<endl;
+
+            rpn += RPNForRule;
+            subRuleLst.append(subRule);
+        }else{
+            rpn += subRule->getText() + " ";
+            if(subRule->getType() == Token::IDENT) rpn += "\n";
+            //qDebug()<<subRule->getText();
+            subRuleLst.append(subRule);
+        }
+    }
+
+    static QString RPNForRule(ASTNode::SharedPtr subRule){
+        Token subRuleType = subRule->getType();
+        switch (subRuleType) {
+        case Token::Add:
+        case Token::Sub:
+        case Token::Mul:
+        case Token::Div:
+        case Token::Power:
+        case Token::Assign:
+            return subRule->getText() + "\n";
+        }
     }
 
 private:
