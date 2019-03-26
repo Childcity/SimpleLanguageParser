@@ -80,10 +80,9 @@ public:
     ASTNode::SharedPtr Power() {
         DEBUGSYNTX("-> Power"<<lexemeValue())
         auto result = Group();
-        if (isMatch("^")) { // повторяем нужное кол-во раз
-            // здесь выбор альтернативы
+        if (isMatch("^")) { // обнаружино поднесение в степень
             QString oper = match("^");
-            auto temp = Add();
+            auto temp = Power();
             result = ASTNode::GetNewInstance(Token::Power, result, temp);
         }
         DEBUGSYNTX("<- Power. Next lexeme"<<lexemeValue())

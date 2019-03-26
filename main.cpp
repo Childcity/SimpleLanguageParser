@@ -13,11 +13,12 @@ using namespace Gorod;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    QString inputProgPath("prog.gor"), outputProgPath("inputResultTable.csv"), inputGrammPath("gorod_v2.json"), outputGrammPath("relations.csv");
+    QApplication app(argc, argv);
+    QString inputProgPath("prog.gor"), lexerOutPath("LexerTable.csv")
+            , inputGrammPath("gorod_v2.json"), outputGrammPath("gorod_v2_Relations.csv");
 
     if(argc >= 3){
-        inputProgPath = argv[1]; outputProgPath = argv[2];
+        inputProgPath = argv[1]; lexerOutPath = argv[2];
     }
 
     if(argc >= 4){
@@ -29,31 +30,43 @@ int main(int argc, char *argv[])
 
     view.setRenderHints(QPainter::SmoothPixmapTransform);
 
-    QFile inFileProg(inputProgPath), outFileProg(outputProgPath), inFileGramm(inputGrammPath), outFileGramm(outputGrammPath);
+    QFile inFileProg(inputProgPath), lexerOutFile(lexerOutPath)
+            , inFileGramm(inputGrammPath), outFileGramm(outputGrammPath);
     if (! inFileProg.open(QIODevice::ReadOnly | QIODevice::Text)
-            || ! outFileProg.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)
-            || ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)
+            //|| ! lexerOutFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)
+            //|| ! inFileGramm.open(QIODevice::ReadOnly | QIODevice::Text)
             || ! outFileGramm.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-        DEBUGM(inFileProg.errorString()<<outFileProg.errorString())
+
+        DEBUGM(inFileProg.errorString() <<lexerOutFile.errorString()
+               <<inFileGramm.errorString() <<outFileGramm.errorString());
         return 500;
     }
 
-    QTextStream input(&inFileProg), outputTable(&outFileProg), inputRules(&inFileGramm), outputRelations(&outFileGramm);
+    QTextStream input(&inFileProg), outputTable(&lexerOutFile)
+            , inputRules(&inFileGramm), outputRelations(&outFileGramm);
 
     try {
 
-        SimplePrecedenceRuleParser ruleParser(inputRules.readAll());
-        ruleParser.Parse();
-        DEBUGRl(ruleParser.toJson());
-        outputRelations << ruleParser.toCSVTable() <<endl <<endl;
-        outputRelations << ruleParser.toJson().replace(";", "!").replace(": ", ": ;");
+        /*
+         * Next lines generate table, that represent Simple Precedence Rules
+         * and write it to 'gorod_v2_Relations.csv' file
+         *
+            SimplePrecedenceRuleParser ruleParser(inputRules.readAll());
+            ruleParser.Parse();
+            DEBUGRl(ruleParser.toJson());
+            outputRelations << ruleParser.toCSVTable() <<endl <<endl;
+            outputRelations << ruleParser.toJson().replace(";", "!").replace(": ", ": ;");
+        */
 
-        return 0;
         const auto lexResult = LexicalAnalyzer::Parse(input.readAll());
 
-        outputTable <<LexicalAnalyzer::GenerateCSVTable(lexResult) <<endl;
-        outputTable <<QJsonDocument::fromVariant(lexResult)
-                      .toJson(QJsonDocument::JsonFormat::Indented);
+        /*
+         * Next lines just write 'lexResult' in human readable table
+         *
+            outputTable <<LexicalAnalyzer::GenerateCSVTable(lexResult) <<endl;
+            outputTable <<QJsonDocument::fromVariant(lexResult)
+                          .toJson(QJsonDocument::JsonFormat::Indented);
+        */
 
         qDebug()<<"\n";
         DEBUGM("LEXICAL ANALIZE PASSED ( OK )!");
@@ -61,11 +74,13 @@ int main(int argc, char *argv[])
 
         const auto astTree = SyntacticalAnalyzer::Parse(lexResult);
         ASTNodeWalker::ShowASTTree(astTree, scene, view);
+
     } catch (Gorod::Exception &e) {
         DEBUGM(e.what().toUtf8().data());
         return EXIT_FAILURE;
     }
 
-    inFileProg.close(); outFileProg.close();
-    return a.exec();
+    inFileProg.close(); lexerOutFile.close();
+    inFileGramm.close(); outFileGramm.close();
+    return app.exec();
 }

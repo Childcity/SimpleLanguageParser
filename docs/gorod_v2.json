@@ -72,8 +72,7 @@
    "Assignment": [
        { "type": "term", "value": "Ident"},
        { "type": "term", "value": "="}, 
-       { "type": "non_term", "value": "Expr"},
-       { "type": "term", "value": ")"}
+       { "type": "non_term", "value": "Expr"}
      ]
   },
   {
@@ -118,7 +117,7 @@
    "Power": [
        { "type": "non_term", "value": "Group"},
        { "type": "term", "value": "^"}, 
-       { "type": "non_term", "value": "Add"}
+       { "type": "non_term", "value": "Group"}
      ]
   },
   {
@@ -140,30 +139,22 @@
    "CondExpr": [
        { "type": "non_term", "value": "LogicExpr"},
        { "type": "term", "value": "?"},
-       { "type": "term", "value": "("},
        { "type": "non_term", "value": "Expr"},
-       { "type": "term", "value": ")"},
-       { "type": "term", "value": ":"},
-       { "type": "term", "value": "("}, 
-       { "type": "non_term", "value": "Expr"},
-       { "type": "term", "value": ")"}
+       { "type": "term", "value": ":"}, 
+       { "type": "non_term", "value": "Expr"}
      ]
   },
   {
    "LogicExpr": [
       [
        { "type": "term", "value": "Ident"},
-       { "type": "term", "value": "<"},
-       { "type": "term", "value": "("},  
-       { "type": "non_term", "value": "Expr"},
-       { "type": "term", "value": ")"}
+       { "type": "term", "value": "<"},  
+       { "type": "non_term", "value": "Expr"}
       ],
       [
        { "type": "term", "value": "Ident"},
-       { "type": "term", "value": ">"},
-       { "type": "term", "value": "("}, 
-       { "type": "non_term", "value": "Expr"},
-       { "type": "term", "value": ")"}
+       { "type": "term", "value": ">"}, 
+       { "type": "non_term", "value": "Expr"}
       ]
      ]
   }

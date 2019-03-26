@@ -14,7 +14,7 @@
 //#define DEBUGlex(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
 #define DEBUGlex(msg){}
 
-//#define DEBUGSYNTX(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
-#define DEBUGSYNTX(msg){}
+#define DEBUGSYNTX(msg) qDebug()<<__FILE__<<" ["<<__LINE__<<"]: "<<msg;
+//#define DEBUGSYNTX(msg){}
 
 #endif // MAIN_H
