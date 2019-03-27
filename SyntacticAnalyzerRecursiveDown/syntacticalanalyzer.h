@@ -308,22 +308,24 @@ public:
             QString childs;
             QVariantList subTokenLst;
             for(auto ch : newSubRulesLst){
-//                subTokenLst += QVariantMap({
-//                                               {"lexem", ch->getText()+" (" + LangTokens::GetToken(ch->getType()) + ")"}
-//                                               //, {"token", LangTokens::GetToken(ch->getType())}
-//                                               , {"id   ", ch->getUniqueName().split("node")[1]}
-//                                           });
+                subTokenLst += QVariantMap({
+                                               {"lexem", ch->getText()+" (" + LangTokens::GetToken(ch->getType()) + ")"}
+                                               //, {"token", LangTokens::GetToken(ch->getType())}
+                                               , {"id", ch->getUniqueName().split("node")[1]}
+                                               , {"polish", findRecurseRPN(ch)}
+                                           });
                 childs += ch->getText() + "(" + ch->getUniqueName().split("node")[1]/*LangTokens::GetToken(ch->getType())*/ + ") ";
             }
-//            synataxTree += QVariantMap({
-//                                           {  "sub_rules", subTokenLst}
-//                                           , {"rule     ", subRule->getText()}
-//                                           , {"id       ", subRule->getUniqueName().split("node")[1]}
-//                                       });
+            synataxTree += QVariantMap({
+                                           {  "sub_rules", subTokenLst}
+                                           , {"rule", subRule->getText()}
+                                           , {"id", subRule->getUniqueName().split("node")[1]}
+                                           , {"polish", RPNForRule(subRule, newSubRulesLst)}
+                                       });
             qDebug().noquote() <<tab <<"Childrens: " <<childs;
             qDebug().noquote() <<tab<<"Was Children OF:" <<subRule->getText()  << "(" <<subRule->getUniqueName().split("node")[1] << ") "<<endl;
 
-            rpn += RPNForRule;
+            rpn += RPNForRule(subRule, newSubRulesLst);
             subRuleLst.append(subRule);
         }else{
             rpn += subRule->getText() + " ";
@@ -332,18 +334,87 @@ public:
             subRuleLst.append(subRule);
         }
     }
-
-    static QString RPNForRule(ASTNode::SharedPtr subRule){
-        Token subRuleType = subRule->getType();
+    static QString RPNForRule(ASTNode::SharedPtr &subToken, QList<ASTNode::SharedPtr> &subRulesLst){
+        QString ruleRpn;
+        Token subRuleType = subToken->getType();
         switch (subRuleType) {
-        case Token::Add:
-        case Token::Sub:
-        case Token::Mul:
-        case Token::Div:
-        case Token::Power:
-        case Token::Assign:
-            return subRule->getText() + "\n";
+            case Token::Add:
+            case Token::Sub:
+            case Token::Mul:
+            case Token::Div:
+            case Token::Power:
+            case Token::Assign:
+            case Token::Less:
+            case Token::More:{
+                QString leftOperRPN = findRecurseRPN(subRulesLst.at(0));
+                QString rightOperRPN = findRecurseRPN(subRulesLst.at(1));
+                return leftOperRPN + rightOperRPN + subToken->getText();
+            }
+            case Token::Int:{
+                for(const auto &child : subRulesLst)
+                    ruleRpn += child->getText()+"#INT";
+                return ruleRpn;
+            }
+            case Token::If:{
+                QString id = subToken->getUniqueName().split("node")[1];
+                QString exprRPN = findRecurseRPN(subRulesLst.at(0));
+                QString blockRPN = findRecurseRPN(subRulesLst.at(1));
+                return " " + exprRPN + "m"+id+"УПХ" + blockRPN + "m"+id+": ";
+            }
+            // Block Rule
+            case Token::LeftBraket:{
+                for(const auto &child : subRulesLst)
+                    ruleRpn += findRecurseRPN(child) + " ";
+                return ruleRpn;
+            }
+            case Token::Read:{
+                return " " + subRulesLst.at(0)->getText() + "#READ";
+            }
+            case Token::Write:{
+                for(const auto &child : subRulesLst)
+                    ruleRpn += findRecurseRPN(child);
+                return " " + ruleRpn + "#WRITE";
+            }
+        case Token::For:{
+            QString id = subToken->getUniqueName().split("node")[1];
+            QString assigmentRPN = findRecurseRPN(subRulesLst.at(0));
+            QString expr1RPN = findRecurseRPN(subRulesLst.at(1));
+            QString expr2RPN = findRecurseRPN(subRulesLst.at(2));
+            QString logicExprRPN = findRecurseRPN(subRulesLst.at(3));
+            QString blockRPN = findRecurseRPN(subRulesLst.at(4));
+            return " " + assigmentRPN + " " + expr1RPN + " " + expr2RPN + " " + logicExprRPN + " " + blockRPN + " ";
         }
+        }
+
+        return QString();
+    }
+//    static QString RPNForRule(ASTNode::SharedPtr &subToken, QList<ASTNode::SharedPtr> &subRulesLst){
+//        QString ruleRpn;
+//        Token subRuleType = subToken->getType();
+//        switch (subRuleType) {
+//        case Token::Add:
+//        case Token::Sub:
+//        case Token::Mul:
+//        case Token::Div:
+//        case Token::Power:
+//        case Token::Assign:
+//        case Token::Less:
+//        case Token::More:
+//            return subToken->getText() + "\n";
+//        }
+
+//        return QString();
+//    }
+
+    static QString findRecurseRPN(ASTNode::SharedPtr rule){
+        if(rule->getType() == Token::IDENT || rule->getType() == Token::NUMBER)
+            return rule->getText();
+
+        for(const auto &child : synataxTree){
+            if(child.toMap()["id"] == rule->getUniqueName().split("node")[1])
+                return child.toMap()["polish"].toString();
+        }
+        return "NOT_FOUND";
     }
 
 private:
