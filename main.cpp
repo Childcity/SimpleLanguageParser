@@ -3,6 +3,7 @@
 #include "LexicalAnalyzer/lexicalanalyzer.h"
 #include "gorodlangexception.h"
 #include "simpleprecedenceruleparser.h"
+#include "SyntacticAnalyzerRecursiveDown/reversepolishnotationbuilder.h"
 
 #include <QApplication>
 #include <QGraphicsView>
@@ -74,7 +75,11 @@ int main(int argc, char *argv[])
         qDebug()<<"\n";
 
         const auto astTree = SyntacticalAnalyzer::Parse(lexResult);
-        SyntacticalAnalyzer::GenerateReversePolishNotation(astTree);
+
+        ReversePolishNotationBuilder rpnBuilder(astTree);
+        rpnBuilder.Generate();
+
+        DEBUGM(rpnBuilder.toRawJson().data());
 
         ASTNodeWalker::ShowASTTree(astTree, scene, view);
 
