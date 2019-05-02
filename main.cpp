@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
         DEBUGM(rpnBuilder.toRawJson().data());
 
-        ASTNodeWalker::ShowASTTree(astTree, scene, view);
+        //ASTNodeWalker::ShowASTTree(astTree, scene, view);
 
     } catch (Gorod::Exception &e) {
         DEBUGM(e.what().toUtf8().data());

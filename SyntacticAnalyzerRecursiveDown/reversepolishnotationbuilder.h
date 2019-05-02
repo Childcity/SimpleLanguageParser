@@ -43,7 +43,8 @@ private:
                                                //, {"token", LangTokens::GetToken(ch->getType())}
                                                , {"id", ch->getUniqueName().split("node")[1]}
                                                , {"polish", findRecurseRPN(ch)}
-                                               , {"result", (ch->getType() == Token::NUMBER)
+                                               , {"result",
+                                                  (ch->getType() == Token::NUMBER)
                                                   ? ch->getText()
                                                   : (ch->getType() == Token::IDENT) ? ch->getText()/*Should take value of Variable from table*/: "0" }
                                            });
@@ -90,7 +91,7 @@ private:
                 QString id = subToken->getUniqueName().split("node")[1];
                 QString exprRPN = findRecurseRPN(subRulesLst.at(0));
                 QString blockRPN = findRecurseRPN(subRulesLst.at(1));
-                return " " + exprRPN + "m"+id+"УПХ" + blockRPN + "m"+id+": ";
+                return " " + exprRPN + " m"+id+"УПХ " + blockRPN + "m"+id+": ";
             }
             // Block Rule
             case Token::LeftBraket:{
