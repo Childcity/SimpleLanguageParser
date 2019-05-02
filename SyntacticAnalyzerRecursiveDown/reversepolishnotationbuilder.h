@@ -108,13 +108,24 @@ private:
                 return " " + ruleRpn + "#WRITE";
             }
             case Token::For:{
-                QString id = subToken->getUniqueName().split("node")[1];
+                QString id1 = subToken->getUniqueName().split("node")[1];           //rj
+                QString id2 = subRulesLst.at(0)->getUniqueName().split("node")[1];  //rj+1
+                QString id3 = subRulesLst.at(1)->getUniqueName().split("node")[1];  //rj+2
+                QString id4 = subRulesLst.at(2)->getUniqueName().split("node")[1];  //mi
+                QString id5 = subRulesLst.at(3)->getUniqueName().split("node")[1];  //mi+1
+                QString id6 = subRulesLst.at(4)->getUniqueName().split("node")[1];  //mi+2
+
+                QString itV = subRulesLst.at(0)->getChild(0)->getText();
                 QString assigmentRPN = findRecurseRPN(subRulesLst.at(0));
                 QString expr1RPN = findRecurseRPN(subRulesLst.at(1));
                 QString expr2RPN = findRecurseRPN(subRulesLst.at(2));
                 QString logicExprRPN = findRecurseRPN(subRulesLst.at(3));
                 QString blockRPN = findRecurseRPN(subRulesLst.at(4));
-                return " " + assigmentRPN + " " + expr1RPN + " " + expr2RPN + " " + logicExprRPN + " " + blockRPN + " ";
+                return " " + assigmentRPN + " r" + id1 + " 1= m" + id4 + ": r" +id3 + " " + expr1RPN + "= r" + id2 + " " + expr2RPN + "= r"
+                        + id1 + " 0= m" + id5 + "УПХ " + itV + itV + "r" + id2 + "+= m" + id5 + ": r" + id1 + " 0= "
+                        + itV + "r" + id3 + "- r" + id2 + "* 0<= " + logicExprRPN + "&&" + " m"
+                        + id6 + "УПХ  " + blockRPN + "  m" + id4 + "БП m" + id6 + ":";
+                //return " " + assigmentRPN + " " + expr1RPN + " " + expr2RPN + " " + logicExprRPN + " " + blockRPN + " ";
             }
         default:
             return QString();
