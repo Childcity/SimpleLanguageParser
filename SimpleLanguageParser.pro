@@ -1,5 +1,5 @@
 QT += gui widgets core
-CONFIG += console
+#CONFIG += console
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
@@ -18,7 +18,8 @@ SOURCES += \
     SyntacticAnalyzerRecursiveDown/syntacticalanalyzer.cpp \
     gorodlangexception.cpp \
     simpleprecedenceruleparser.cpp \
-    SyntacticAnalyzerRecursiveDown/reversepolishnotationbuilder.cpp
+    SyntacticAnalyzerRecursiveDown/reversepolishnotationbuilder.cpp \
+    Executor/executor.cpp
 
 HEADERS += \
     lexicalparserbase.h \
@@ -35,4 +36,5 @@ HEADERS += \
     SyntacticAnalyzerRecursiveDown/syntacticalanalyzer.h \
     gorodlangexception.h \
     simpleprecedenceruleparser.h \
-    SyntacticAnalyzerRecursiveDown/reversepolishnotationbuilder.h
+    SyntacticAnalyzerRecursiveDown/reversepolishnotationbuilder.h \
+    Executor/executor.h

@@ -43,10 +43,10 @@ private:
                                                //, {"token", LangTokens::GetToken(ch->getType())}
                                                , {"id", ch->getUniqueName().split("node")[1]}
                                                , {"polish", findRecurseRPN(ch)}
-                                               , {"result",
-                                                  (ch->getType() == Token::NUMBER)
-                                                  ? ch->getText()
-                                                  : (ch->getType() == Token::IDENT) ? ch->getText()/*Should take value of Variable from table*/: "0" }
+//                                               , {"result",
+//                                                  (ch->getType() == Token::NUMBER)
+//                                                  ? ch->getText()
+//                                                  : (ch->getType() == Token::IDENT) ? ch->getText()/*Should take value of Variable from table*/: "0" }
                                            });
                 childs += ch->getText() + "(" + ch->getUniqueName().split("node")[1]/*LangTokens::GetToken(ch->getType())*/ + ") ";
             }
@@ -56,10 +56,10 @@ private:
                                           , {"rule", subRule->getText()}
                                           , {"id", subRule->getUniqueName().split("node")[1]}
                                           , {"polish", RPNForRule(subRule, newSubRulesLst)}
-                                          , {"result", countMathExpr(subRule, newSubRulesLst)}
+                                          //, {"result", countMathExpr(subRule, newSubRulesLst)}
                                        });
-            qDebug().noquote() <<tab <<"Childrens: " <<childs;
-            qDebug().noquote() <<tab<<"Was Children OF:" <<subRule->getText()  << "(" <<subRule->getUniqueName().split("node")[1] << ") "<<endl;
+            //qDebug().noquote() <<tab <<"Childrens: " <<childs;
+            //qDebug().noquote() <<tab<<"Was Children OF:" <<subRule->getText()  << "(" <<subRule->getUniqueName().split("node")[1] << ") "<<endl;
         }
 
         subRuleLst.append(subRule);
@@ -143,44 +143,44 @@ private:
         return "NOT_FOUND";
     }
 
-    QString countMathExpr(ASTNode::SharedPtr &subToken, QList<ASTNode::SharedPtr> &subRulesLst){
-        Token subRuleType = subToken->getType();
+//    QString countMathExpr(ASTNode::SharedPtr &subToken, QList<ASTNode::SharedPtr> &subRulesLst){
+//        Token subRuleType = subToken->getType();
 
-        if(subRulesLst.size() != 2) //if operators are not 2 this is error? so just return 0s
-            return QString();
+//        if(subRulesLst.size() != 2) //if operators are not 2 this is error? so just return 0s
+//            return QString();
 
-        if(subRulesLst.at(0)->getType() == Token::IDENT
-                || subRulesLst.at(1)->getType() == Token::IDENT)
-            return subRulesLst.at(0)->getText()+subToken->getText()+subRulesLst.at(1)->getText();
+//        if(subRulesLst.at(0)->getType() == Token::IDENT
+//                || subRulesLst.at(1)->getType() == Token::IDENT)
+//            return subRulesLst.at(0)->getText()+subToken->getText()+subRulesLst.at(1)->getText();
 
-        int leftOperRPN = findRecurseRPNRes(subRulesLst.at(0));
-        int rightOperRPN = findRecurseRPNRes(subRulesLst.at(1));
-        switch (subRuleType) {
-            case Token::Add:
-                return QString::number(leftOperRPN + rightOperRPN);
-            case Token::Sub:
-                return QString::number(leftOperRPN - rightOperRPN);
-            case Token::Mul:
-                return QString::number(leftOperRPN * rightOperRPN);
-            case Token::Div:
-                return QString::number(leftOperRPN / rightOperRPN);
-            case Token::Power:
-                return QString::number(pow(leftOperRPN, rightOperRPN));
-            default:
-                return QString();
-        }
-    }
+//        int leftOperRPN = findRecurseRPNRes(subRulesLst.at(0));
+//        int rightOperRPN = findRecurseRPNRes(subRulesLst.at(1));
+//        switch (subRuleType) {
+//            case Token::Add:
+//                return QString::number(leftOperRPN + rightOperRPN);
+//            case Token::Sub:
+//                return QString::number(leftOperRPN - rightOperRPN);
+//            case Token::Mul:
+//                return QString::number(leftOperRPN * rightOperRPN);
+//            case Token::Div:
+//                return QString::number(leftOperRPN / rightOperRPN);
+//            case Token::Power:
+//                return QString::number(pow(leftOperRPN, rightOperRPN));
+//            default:
+//                return QString();
+//        }
+//    }
 
-    int findRecurseRPNRes(ASTNode::SharedPtr rule){
-        if(rule->getType() == Token::NUMBER)
-            return rule->getText().toInt();
+//    int findRecurseRPNRes(ASTNode::SharedPtr rule){
+//        if(rule->getType() == Token::NUMBER)
+//            return rule->getText().toInt();
 
-        for(const auto &child : polishTree){
-            if(child.toMap()["id"] == rule->getUniqueName().split("node")[1])
-                return child.toMap()["result"].toInt();
-        }
-        return 0;
-    }
+//        for(const auto &child : polishTree){
+//            if(child.toMap()["id"] == rule->getUniqueName().split("node")[1])
+//                return child.toMap()["result"].toInt();
+//        }
+//        return 0;
+//    }
 
 private:
     QVariantList polishTree;

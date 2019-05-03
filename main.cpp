@@ -4,6 +4,7 @@
 #include "gorodlangexception.h"
 #include "simpleprecedenceruleparser.h"
 #include "SyntacticAnalyzerRecursiveDown/reversepolishnotationbuilder.h"
+#include "Executor/executor.h"
 
 #include <QApplication>
 #include <QGraphicsView>
@@ -75,13 +76,26 @@ int main(int argc, char *argv[])
         qDebug()<<"\n";
 
         const auto astTree = SyntacticalAnalyzer::Parse(lexResult);
+        Executor executor;
 
-        ReversePolishNotationBuilder rpnBuilder(astTree);
-        rpnBuilder.Generate();
+        QObject::connect(&executor, &Executor::sigReadText, [](qint64 &number){
+            QTextStream s(stdin);
+            QString value = s.readAll();
+            bool *ok;
+            number = value.toLongLong(ok);
+            if(!ok){
+                throw std::runtime_error("NaN");
+            }
+        });
 
-        DEBUGM(rpnBuilder.toRawJson().data());
+        executor.exec(astTree);
 
-        //ASTNodeWalker::ShowASTTree(astTree, scene, view);
+        //ReversePolishNotationBuilder rpnBuilder(astTree);
+        //rpnBuilder.Generate();
+
+        //DEBUGM(rpnBuilder.toRawJson().data());
+
+        ASTNodeWalker::ShowASTTree(astTree, scene, view);
 
     } catch (Gorod::Exception &e) {
         DEBUGM(e.what().toUtf8().data());
