@@ -10,6 +10,7 @@ class Executor: public QObject {
     Q_OBJECT
     using Token = LangTokens::Token;
     QMap<QString, qint64> globalVarMap;
+    bool isRunning_ = false;
 
 signals:
     void sigReadText(qint64 &);
@@ -24,6 +25,9 @@ public:
             return;
 
         for (int i = 0; i < subTree->getChildsCount(); i++) {
+            if(! isRunning_)
+                return;
+
             ASTNode::SharedPtr child = subTree->getChild(i);
             switch (child->getType()) {
                 case Token::LeftBraket:     exec(child); break;
@@ -36,7 +40,18 @@ public:
                 default:
                   break;
             }
+
+            if(! isRunning_)
+                return;
         }
+    }
+
+    void setIsRunning(bool isRunning){
+        isRunning_ = isRunning;
+    }
+
+    bool isRunning(){
+        return isRunning_;
     }
 
 private:
@@ -83,6 +98,8 @@ private:
              globalVarMap[itVarName] += by
              )
         {
+            if(! isRunning_)
+                return;
             exec(forTree->getChild(4));
             to = countExpr(forTree->getChild(1)).toLongLong();
             by = countExpr(forTree->getChild(2)).toLongLong();
