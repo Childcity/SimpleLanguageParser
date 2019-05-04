@@ -80,12 +80,17 @@ int main(int argc, char *argv[])
 
         QObject::connect(&executor, &Executor::sigReadText, [](qint64 &number){
             QTextStream s(stdin);
-            QString value = s.readAll();
-            bool *ok;
-            number = value.toLongLong(ok);
-            if(!ok){
+            QString value = s.readLine();
+            bool ok;
+            number = value.toLongLong(&ok);
+            if(! ok){
                 throw std::runtime_error("NaN");
             }
+        });
+
+        QObject::connect(&executor, &Executor::sigWriteText, [](qint64 number){
+            QTextStream s(stdout);
+            s << number <<endl;
         });
 
         executor.exec(astTree);
@@ -95,7 +100,7 @@ int main(int argc, char *argv[])
 
         //DEBUGM(rpnBuilder.toRawJson().data());
 
-        ASTNodeWalker::ShowASTTree(astTree, scene, view);
+        //ASTNodeWalker::ShowASTTree(astTree, scene, view);
 
     } catch (Gorod::Exception &e) {
         DEBUGM(e.what().toUtf8().data());

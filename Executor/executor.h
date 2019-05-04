@@ -13,6 +13,7 @@ class Executor: public QObject {
 
 signals:
     void sigReadText(qint64 &);
+    void sigWriteText(qint64);
 
 public:
 
@@ -25,11 +26,13 @@ public:
         for (int i = 0; i < subTree->getChildsCount(); i++) {
             ASTNode::SharedPtr child = subTree->getChild(i);
             switch (child->getType()) {
-                case Token::LeftBraket: exec(child); break;
-                case Token::Int: execVarInit(child); break;
-                case Token::Assign: execAssignment(child); break;
-                case Token::If: execIf(child); break;
-                case Token::Read: execRead(child); break;
+                case Token::LeftBraket:     exec(child); break;
+                case Token::Int:            execVarInit(child); break;
+                case Token::Assign:         execAssignment(child); break;
+                case Token::If:             execIf(child); break;
+                case Token::Read:           execRead(child); break;
+                case Token::Write:          execWrite(child); break;
+                case Token::For:            execFor(child); break;
                 default:
                   break;
             }
@@ -59,8 +62,34 @@ private:
         qint64 number;
         emit sigReadText(number);
         globalVarMap[readTree->getChild(0)->getText()] = number;
+        showVariables();
     }
 
+    void execWrite(ASTNode::SharedPtr writeTree){
+        emit sigWriteText(countExpr(writeTree->getChild(0)).toLongLong());
+    }
+
+    void execFor(ASTNode::SharedPtr forTree){
+        QString itVarName = forTree->getChild(0)->getChild(0)->getText();
+        qint64 from = countExpr(forTree->getChild(0)->getChild(1)).toLongLong();
+        qint64 to = countExpr(forTree->getChild(1)).toLongLong();
+        qint64 by = countExpr(forTree->getChild(2)).toLongLong();
+        bool while_ = countExpr(forTree->getChild(3)).toBool();
+
+        DEBUGEXE("For itVar(" <<itVarName <<") =" <<from <<"to" <<to <<"by" <<by <<"while" <<while_);
+
+        for (globalVarMap[itVarName] = from;
+             globalVarMap[itVarName] < to && while_;
+             globalVarMap[itVarName] += by
+             )
+        {
+            exec(forTree->getChild(4));
+            to = countExpr(forTree->getChild(1)).toLongLong();
+            by = countExpr(forTree->getChild(2)).toLongLong();
+            while_ = countExpr(forTree->getChild(3)).toBool();
+            DEBUGEXE("For itVar(" <<itVarName <<"=" <<globalVarMap[itVarName] <<") =" <<from <<"to" <<to <<"by" <<by <<"while" <<while_);
+        }
+    }
 
 
 
@@ -72,7 +101,7 @@ private:
         for (auto it = globalVarMap.constKeyValueBegin(); it != globalVarMap.constKeyValueEnd(); it++) {
             vars.append(it.base().key() + ":" + QString("%1 ").arg(it.base().value()));
         }
-        DEBUGEXE(vars);
+        DEBUGEXE("VarList: " <<vars);
     }
 
     QVariant countExpr(ASTNode::SharedPtr exprTree){
@@ -116,7 +145,7 @@ private:
             case Token::Div:
                 return leftOperRPN / rightOperRPN;
             case Token::Power:
-                return pow(leftOperRPN, rightOperRPN);
+                return static_cast<qint64>(pow(leftOperRPN, rightOperRPN));
             default:
                 DEBUGEXE("!!! Unrecognized Math Operation !!!");
                 return 0;
