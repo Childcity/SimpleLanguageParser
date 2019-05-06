@@ -93,6 +93,7 @@ int main(int argc, char *argv[])
             s << number <<endl;
         });
 
+        executor.setIsRunning(true);
         executor.exec(astTree);
 
         //ReversePolishNotationBuilder rpnBuilder(astTree);
@@ -100,7 +101,7 @@ int main(int argc, char *argv[])
 
         //DEBUGM(rpnBuilder.toRawJson().data());
 
-        //ASTNodeWalker::ShowASTTree(astTree, scene, view);
+        ASTNodeWalker::ShowASTTree(astTree, scene, view);
 
     } catch (Gorod::Exception &e) {
         DEBUGM(e.what().toUtf8().data());
